@@ -54,17 +54,16 @@ class ContainerFrame(customtkinter.CTkFrame):
     def get_value(self):
         '''Get values from the ContainerFrame childs'''
         _value = {}
+        # Get value recursively of other containe frames
         for kid in self.inner.winfo_children():
             if issubclass(type(kid),ContainerFrame):
-                #key              = kid._key
-                #this_value       = kid.get_value_1()
                 _value[kid._key]      = kid.get_value()
         return _value
             
 
     @classmethod
     def initialize(cls,root,dic_elements):
-        '''Initilizes and Packs the elements of a dictionary in a list way'''
+        '''Initilizes and packs simply the elements of the '''
         # Recursively iterate
         class_type ,class_kids,dic_kwargs = divide_arguments(dic_elements)
         # execute this class
@@ -87,6 +86,7 @@ class ContainerFrame(customtkinter.CTkFrame):
             
             
     def remove_items(self):
+        '''Removes the childs of this frame'''
         for kid in self.inner.winfo_children():
             # Forget the mapping
             if kid.winfo_ismapped():
@@ -132,45 +132,43 @@ class MainFrame(ContainerFrame):
         self.label    = customtkinter.CTkLabel(self, text=title, font = TITLE_FONT)
         self.text     = customtkinter.CTkLabel(self,text=info_text,wraplength = wraplength,font=font_label)
         self.button   = customtkinter.CTkButton(self,text= button_text,font=font_button,command=self.execute)
-        # Inner frame is scrollable
+        # Inner frame is an scrollable frame
         self.inner     = customtkinter.CTkScrollableFrame(self)
-        #self.scrollable
-        self.label.pack(fill=BOTH,padx=20)
-        self.text.pack(fill=BOTH,padx=20)
-        self.inner.pack(fill=BOTH,padx=20,expand=TRUE)
-        self.button.pack(fill=BOTH,padx=50)
+        # Pack the rest of options 
+        self.label.pack(fill=X,expand=TRUE,padx=5, pady=5)
+        self.text.pack(fill=X,expand=TRUE,padx=5, pady =5)
+        self.inner.pack(fill=BOTH,expand=TRUE,padx=20,pady=5)
+        self.button.pack(fill=X,expand=TRUE,padx=50,pady = 5)
             
     
     def execute(self):
         '''Do anything'''
-        print("parent")
         pass
     
             
 
 class AppearingFrame(ContainerFrame):
+    '''AppearingFrame: It hides the inner content while pressing the button'''
     def __init__(self,root,is_packed,info_text,font_button=('Courier', 20,'bold'),image=None,*args,**kwargs):
-        '''AppearingFrame with a button that shows the inner frame'''
         super().__init__(root,*args,**kwargs)
         self.unpack_button=customtkinter.CTkButton(self,text = info_text,
                                                    command = self.do_packing,
                                                    font=font_button,anchor="w",image=image)
         
         self.inner        = ContainerFrame(self,key="inner")
-        self.unpack_button.pack(fill=BOTH)
+        self.unpack_button.pack(fill=X,expand=TRUE,pady=5,padx=5)
         # Start with packed or unpacked
         if is_packed:
-            self.inner.pack(expand=TRUE,fill=BOTH)
+            self.inner.pack(expand=TRUE,fill=BOTH,pady=5,padx=5)
         
         
     def do_packing(self):
-        '''Pack the subframe'''
+        '''Pack or unpack the subframe'''
         if self.inner.winfo_ismapped():
             self.inner.pack_forget()
         else:
             print(self.winfo_width())
             self.inner.pack(expand=TRUE,fill=BOTH)
-        #self.is_packed=not self.is_packed
     
 
 
@@ -184,11 +182,10 @@ class GeneralFrame(ContainerFrame):
         self.text      = customtkinter.CTkLabel(self.info_inner,text=info_text,wraplength = wraplength,font=font_info)
         # Modifiable
         self.embedded = customtkinter.CTkFrame(self,fg_color=self.cget("fg_color"))
-        self.info_inner.pack(side=LEFT,expand=TRUE,fill=BOTH,anchor=W)
-        self.embedded.pack(side=RIGHT,expand=TRUE,fill=BOTH,anchor=W)
-        self.label.pack(side=TOP,padx=5,expand=TRUE,fill=BOTH)
-        self.text.pack(side=BOTTOM,padx=5,expand=TRUE,fill=BOTH)
-        #self.label.pack(side=BOTTOM,fill=BOTH,expand=TRUE,padx=5)
+        self.info_inner.pack(side=LEFT,expand=TRUE,fill=BOTH,anchor=W,padx=5,pady=5)
+        self.embedded.pack(side=RIGHT,expand=TRUE,fill=BOTH,anchor=W,padx=5,pady=5)
+        self.label.pack(side=TOP,expand=TRUE,fill=BOTH,padx=5,pady=5)
+        self.text.pack(side=BOTTOM,expand=TRUE,fill=BOTH,padx=5,pady=5)
 
 
 
@@ -201,7 +198,7 @@ class GeneralEntry(GeneralFrame):
         self.tk_entry.insert(0, default)
         self._value    = default
         # Pack into a toolchain
-        self.tk_entry.pack(side= BOTTOM)
+        self.tk_entry.pack(expand=TRUE,fill=BOTH)
         
     def get_value(self):
         '''Get the internal value of the tk_entry'''
@@ -222,7 +219,7 @@ class GeneralCheckButton(GeneralFrame):
         self._value.set(int(default))
         self.tk_checkbutton =  customtkinter.CTkCheckBox(self.embedded, text="",variable=self._value, onvalue=1, offvalue=0)
         # Pack into a toolchain
-        self.tk_checkbutton.pack()
+        self.tk_checkbutton.pack(expand=TRUE,fill=BOTH)
     
     def get_value(self):
         '''Gets the value of the StringVar'''
@@ -230,6 +227,7 @@ class GeneralCheckButton(GeneralFrame):
     
     
 class GeneralLabelMenu(GeneralFrame):
+    '''Label Menu'''
     def __init__(self,root,options,*args,**kwargs):
         super().__init__(root,*args,**kwargs)
         self._value =  StringVar(self.embedded)
@@ -246,6 +244,7 @@ class GeneralLabelMenu(GeneralFrame):
 
 
 class GeneralFileExplorer(GeneralFrame):
+    '''File explorer'''
     def __init__(self,root,filetypes=(('All files','*.*'),('text files', '*.txt')),*args,**kwargs):
         super().__init__(root,*args,**kwargs)
         self.tk_label          = customtkinter.CTkLabel(self.embedded,text ="Select File",font=FONT)
@@ -272,6 +271,7 @@ class GeneralFileExplorer(GeneralFrame):
 
 
 class GeneralDirectoryExplorer(GeneralFrame):
+    '''Directory Browser'''
     def __init__(self,root,*args,**kwargs):
         super().__init__(root,*args,**kwargs)
         self.tk_label          = customtkinter.CTkLabel(self.embedded,text ="Select Directory",font=FONT)
@@ -296,6 +296,7 @@ class GeneralDirectoryExplorer(GeneralFrame):
 
 
 class GeneralTextBox(GeneralFrame):
+    '''Text Box'''
     def __init__(self,root,default="",is_disabled=False,*args,**kwargs):
         super().__init__(root,*args,**kwargs)
         self.tk_textbox =  customtkinter.CTkTextbox(self.embedded)
