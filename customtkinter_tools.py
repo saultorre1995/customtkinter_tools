@@ -15,7 +15,7 @@ from tkinter import ttk
 import tkinter.font as font
 from tkinter import filedialog
 import customtkinter
-from PIL import Image,ImageTk
+#from PIL import Image,ImageTk
 
 
 FONT       = ('Courier', 20)
