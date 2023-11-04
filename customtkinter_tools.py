@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Oct 26 18:38:38 2023
-
-@author: saulgr
+@author: Saul Gonzalez Resines
+Package containing standard classes for the development of UI, 
+based on customtkinter classes
 """
 
 import os
@@ -15,10 +16,10 @@ from tkinter import ttk
 import tkinter.font as font
 from tkinter import filedialog
 import customtkinter
-#from PIL import Image,ImageTk
 
 
-FONT       = ('Courier', 20)
+# Default Fonts that are defined
+FONT       = ('Nimbus Sans', 20)
 FONT1      = ('Nimbus Sans',25,"bold")
 TITLE_FONT = ('Nimbus Sans',50,"bold")
 
@@ -142,7 +143,7 @@ class MainFrame(ContainerFrame):
             
     
     def execute(self):
-        '''Do anything'''
+        '''Do nothing'''
         pass
     
             
@@ -167,7 +168,7 @@ class AppearingFrame(ContainerFrame):
         if self.inner.winfo_ismapped():
             self.inner.pack_forget()
         else:
-            print(self.winfo_width())
+            #print(self.winfo_width())
             self.inner.pack(expand=TRUE,fill=BOTH)
     
 
@@ -284,10 +285,9 @@ class GeneralDirectoryExplorer(GeneralFrame):
         filedir = filedialog.askdirectory(initialdir = "/",
                                                title = "Select a Directory")
         # Change label contents
-        print(filedir)
         if type(filedir)==tuple:
             filedir=""
-        self.tk_label.configure(text="File Opened: "+filedir)
+        self.tk_label.configure(text=filedir)
      
     def get_value(self):
         '''Gets the value of the label'''
@@ -315,9 +315,3 @@ class GeneralTextBox(GeneralFrame):
         '''Update text box'''
         self.tk_textbox.delete("0.0", "end")
         self.tk_textbox.insert("0.0", text)
-    
-
-
-
-    
-        
